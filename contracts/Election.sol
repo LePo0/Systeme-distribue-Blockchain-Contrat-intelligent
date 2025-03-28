@@ -3,8 +3,9 @@ pragma solidity ^0.8.24;
 
 import "./Ownable.sol";
 import "./SafeMath.sol";
+import "./Whitelist.sol";
 
-contract Election is Ownable {
+contract Election is Ownable, Whitelist {
 
 using SafeMath for uint256;
 
@@ -22,11 +23,12 @@ using SafeMath for uint256;
     mapping(uint => Candidate) public candidates;
     // Store Candidates Count
     uint public candidatesCount;
-
+    mapping(address => bool) public authorizedAddresses;
     // voted event
     event votedEvent ( uint indexed _candidateId);
 
-    function addCandidate (string memory _name) public onlyOwner {
+    function addCandidate (string memory _name) public {
+        require(isWhitelisted(msg.sender), "Not authorized");
         candidatesCount ++;
         candidates[candidatesCount] = Candidate(candidatesCount, _name, 0);
     }
